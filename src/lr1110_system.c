@@ -35,9 +35,13 @@
  */
 
 #include <stdlib.h>
+#include <stdio.h>
+
+#include "system.h"
 
 #include "lr1110_system.h"
 #include "lr1110_hal.h"
+//#include "lr1110_modem_hal.h"
 
 /*
  * -----------------------------------------------------------------------------
@@ -158,6 +162,40 @@ lr1110_status_t lr1110_system_get_status( const void* context, lr1110_system_sta
 
     return status;
 }
+
+
+static uint8_t cbuffer2[20];
+
+lr1110_status_t lr1110_system_get_status2( const void* context, lr1110_system_stat1_t* stat1,
+                                          lr1110_system_stat2_t* stat2, lr1110_system_irq_mask_t* irq_status )
+{
+//    uint8_t         cbuffer[LR1110_SYSTEM_GET_STATUS_CMD_LENGTH] = { 0x00 };
+    lr1110_status_t status                                       = LR1110_STATUS_ERROR;
+
+    cbuffer2[0] = ( uint8_t )( LR1110_SYSTEM_GET_STATUS_OC >> 8 );
+    cbuffer2[1] = ( uint8_t )( LR1110_SYSTEM_GET_STATUS_OC >> 0 );
+
+    status =
+        ( lr1110_status_t ) lr1110_hal_write_read( context, cbuffer2, cbuffer2, LR1110_SYSTEM_GET_STATUS_CMD_LENGTH );
+
+    if( status == LR1110_STATUS_OK )
+    {
+        stat1->is_interrupt_active = ( ( cbuffer2[0] & 0x01 ) != 0 ) ? true : false;
+        stat1->command_status      = ( lr1110_system_command_status_t )( cbuffer2[0] >> 1 );
+
+        stat2->is_running_from_flash = ( ( cbuffer2[1] & 0x01 ) != 0 ) ? true : false;
+        stat2->chip_mode             = ( lr1110_system_chip_modes_t )( ( cbuffer2[1] & 0x0F ) >> 1 );
+        stat2->reset_status          = ( lr1110_system_reset_status_t )( ( cbuffer2[1] & 0xF0 ) >> 4 );
+
+        *irq_status =
+            ( ( lr1110_system_irq_mask_t ) cbuffer2[2] << 24 ) + ( ( lr1110_system_irq_mask_t ) cbuffer2[3] << 16 ) +
+            ( ( lr1110_system_irq_mask_t ) cbuffer2[4] << 8 ) + ( ( lr1110_system_irq_mask_t ) cbuffer2[5] << 0 );
+    }
+__NOP();
+    return status;
+}
+
+
 
 lr1110_status_t lr1110_system_get_irq_status( const void* context, lr1110_system_irq_mask_t* irq_status )
 {
@@ -324,6 +362,7 @@ lr1110_status_t lr1110_system_clear_irq_status( const void* context, const lr111
     cbuffer[5] = ( uint8_t )( irqs_to_clear >> 0 );
 
     return ( lr1110_status_t ) lr1110_hal_write( context, cbuffer, LR1110_SYSTEM_CLEAR_IRQ_CMD_LENGTH, 0, 0 );
+//        return ( lr1110_status_t ) lr1110_modem_hal_write( context, cbuffer, LR1110_SYSTEM_CLEAR_IRQ_CMD_LENGTH, 0, 0 );
 }
 
 lr1110_status_t lr1110_system_get_and_clear_irq_status( const void* context, lr1110_system_irq_mask_t* irq )
@@ -348,6 +387,18 @@ lr1110_status_t lr1110_system_cfg_lfclk( const void* context, const lr1110_syste
 {
     uint8_t cbuffer[LR1110_SYSTEM_CFG_LFCLK_CMD_LENGTH];
     uint8_t config = lfclock_cfg | ( wait_for_32k_ready << 2 );
+
+    cbuffer[0] = ( uint8_t )( LR1110_SYSTEM_CFG_LFCLK_OC >> 8 );
+    cbuffer[1] = ( uint8_t )( LR1110_SYSTEM_CFG_LFCLK_OC >> 0 );
+
+    cbuffer[2] = config;
+
+    return ( lr1110_status_t ) lr1110_hal_write( context, cbuffer, LR1110_SYSTEM_CFG_LFCLK_CMD_LENGTH, 0, 0 );
+}
+
+lr1110_status_t lr1110_system_cfg_lfclk2( const void* context, uint8_t config)
+{
+    uint8_t cbuffer[LR1110_SYSTEM_CFG_LFCLK_CMD_LENGTH];
 
     cbuffer[0] = ( uint8_t )( LR1110_SYSTEM_CFG_LFCLK_OC >> 8 );
     cbuffer[1] = ( uint8_t )( LR1110_SYSTEM_CFG_LFCLK_OC >> 0 );

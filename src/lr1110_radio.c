@@ -329,6 +329,7 @@ lr1110_status_t lr1110_radio_set_gfsk_sync_word( const void* context, const uint
     return ( lr1110_status_t ) lr1110_hal_write( context, cbuffer, LR1110_RADIO_SET_GFSK_SYNC_WORD_CMD_LENGTH, 0, 0 );
 }
 
+#if 0
 #ifndef LR1110_DISABLE_WARNINGS
 #warning \
     "The function lr1110_radio_set_lora_sync_word replaces the \
@@ -339,6 +340,8 @@ only, please use lr1110_radio_set_lora_public_network. \
 To deactivate this warning, define C preprocessor symbol \
 LR1110_DISABLE_WARNINGS."
 #endif
+#endif
+
 lr1110_status_t lr1110_radio_set_lora_sync_word( const void* context, const uint8_t sync_word )
 {
     uint8_t cbuffer[LR1110_RADIO_SET_LORA_SYNC_WORD_CMD_LENGTH];

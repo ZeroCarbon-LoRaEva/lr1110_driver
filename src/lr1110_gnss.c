@@ -34,10 +34,12 @@
  * --- DEPENDENCIES ------------------------------------------------------------
  */
 
+#include "system.h"
+#include "system_time.h"
 #include "lr1110_gnss.h"
 #include "lr1110_regmem.h"
 #include "lr1110_hal.h"
-
+//#include "lr1110_modem_hal.h"
 /*
  * -----------------------------------------------------------------------------
  * --- PRIVATE MACROS-----------------------------------------------------------
@@ -367,6 +369,7 @@ lr1110_status_t lr1110_gnss_set_constellations_to_use( const void*              
     cbuffer[2] = constellation_to_use;
 
     return ( lr1110_status_t ) lr1110_hal_write( context, cbuffer, LR1110_GNSS_SET_CONSTALLATION_CMD_LENGTH, 0, 0 );
+//    return ( lr1110_status_t ) lr1110_modem_hal_write( context, cbuffer, LR1110_GNSS_SET_CONSTALLATION_CMD_LENGTH, 0, 0 );
 }
 
 lr1110_status_t lr1110_gnss_read_used_constellations( const void*                       context,
@@ -518,6 +521,7 @@ lr1110_status_t lr1110_gnss_set_assistance_position(
     cbuffer[5] = ( uint8_t )( longitude );
 
     return ( lr1110_status_t ) lr1110_hal_write( context, cbuffer, LR1110_GNSS_SET_ASSISTANCE_POSITION_CMD_LENGTH, 0,
+//    return ( lr1110_status_t ) lr1110_modem_hal_write( context, cbuffer, LR1110_GNSS_SET_ASSISTANCE_POSITION_CMD_LENGTH, 0,
                                                  0 );
 }
 
@@ -626,7 +630,9 @@ lr1110_status_t lr1110_gnss_get_detected_satellites( const void* context, const 
     cbuffer[1] = ( uint8_t )( LR1110_GNSS_GET_SATELLITES_OC >> 0 );
 
     const lr1110_hal_status_t hal_status =
-        lr1110_hal_read( context, cbuffer, LR1110_GNSS_GET_SV_SATELLITES_CMD_LENGTH, result_buffer, read_size );
+    lr1110_hal_read( context, cbuffer, LR1110_GNSS_GET_SV_SATELLITES_CMD_LENGTH, result_buffer, read_size );
+    lr1110_hal_read( context, cbuffer, LR1110_GNSS_GET_SV_SATELLITES_CMD_LENGTH, result_buffer, read_size );
+    lr1110_hal_read( context, cbuffer, LR1110_GNSS_GET_SV_SATELLITES_CMD_LENGTH, result_buffer, read_size );
     if( hal_status == LR1110_HAL_STATUS_OK )
     {
         for( uint8_t index_satellite = 0; index_satellite < max_satellites_to_fetch; index_satellite++ )

@@ -58,6 +58,19 @@ typedef enum lr1110_status_e
     LR1110_STATUS_ERROR = 3,
 } lr1110_status_t;
 
+
+
+//typedef struct lr1110_s
+//{
+//    hal_gpio_t                  reset;
+//    hal_gpio_t                  busy;
+//    hal_gpio_irq_t              event;
+//    hal_gpio_t                  nss;
+//    hal_spi_t                   spi;
+//    uint32_t                    spi_id;
+//    lr1110_hal_operating_mode_t op_mode;
+//} lr1110_t;
+
 /*
  * -----------------------------------------------------------------------------
  * --- PUBLIC FUNCTIONS PROTOTYPES ---------------------------------------------

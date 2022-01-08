@@ -100,6 +100,9 @@ lr1110_status_t lr1110_system_wakeup( const void* context );
 lr1110_status_t lr1110_system_get_status( const void* context, lr1110_system_stat1_t* stat1,
                                           lr1110_system_stat2_t* stat2, lr1110_system_irq_mask_t* irq_status );
 
+lr1110_status_t lr1110_system_get_status2( const void* context, lr1110_system_stat1_t* stat1,
+                                          lr1110_system_stat2_t* stat2, lr1110_system_irq_mask_t* irq_status );
+
 /*!
  * @brief Return irq_status
  *
@@ -276,6 +279,8 @@ lr1110_status_t lr1110_system_get_and_clear_irq_status( const void* context, lr1
  */
 lr1110_status_t lr1110_system_cfg_lfclk( const void* context, const lr1110_system_lfclk_cfg_t lfclock_cfg,
                                          const bool wait_for_32k_ready );
+
+lr1110_status_t lr1110_system_cfg_lfclk2( const void* context, uint8_t config);
 
 /*!
  * @brief Enable and configure TCXO supply voltage and detection timeout

@@ -230,7 +230,7 @@ lr1110_status_t lr1110_bootloader_write_flash_encrypted( const void* context, co
                                                  length * sizeof( uint32_t ) );
 }
 
-lr1110_status_t lr1110_bootloader_write_flash_encrypted_full( const void* context, const uint32_t offset,
+lr1110_status_t lr1110_bootloader_write_flash_encrypted_full_ORG( const void* context, const uint32_t offset,
                                                               const uint32_t* buffer, const uint32_t length )
 {
     lr1110_status_t status           = LR1110_STATUS_OK;
@@ -251,6 +251,39 @@ lr1110_status_t lr1110_bootloader_write_flash_encrypted_full( const void* contex
 
     return status;
 }
+
+int8_t uart_receive_binary( uint8_t* buffer);
+int8_t uart_receive_reqest();
+extern int32_t expect_address;
+
+lr1110_status_t lr1110_bootloader_write_flash_encrypted_full( const void* context, const uint32_t offset,
+                                                              const uint32_t* buffer, const uint32_t length )
+{
+    lr1110_status_t status           = LR1110_STATUS_OK;
+    uint32_t        remaining_length = length;
+    uint32_t        local_offset     = offset;
+    uint32_t        loop             = 0;
+
+	expect_address=0;
+    status = (lr1110_status_t)uart_receive_reqest();
+	if (status !=0) {return status;}
+    while( ( remaining_length != 0 ) && ( status == LR1110_STATUS_OK ) )
+    {
+
+		status = (lr1110_status_t)uart_receive_binary((uint8_t*)buffer);
+		if (status !=0) {break;}
+
+        status = ( lr1110_status_t ) lr1110_bootloader_write_flash_encrypted( context, local_offset, buffer, min( remaining_length, 64 ) );
+
+        local_offset += LR1110_FLASH_DATA_UINT8_MAX;
+        remaining_length = ( remaining_length < 64 ) ? 0 : ( remaining_length - 64 );
+
+        loop++;
+    }
+
+    return status;
+}
+
 
 lr1110_status_t lr1110_bootloader_get_hash( const void* context, lr1110_bootloader_hash_t hash )
 {
